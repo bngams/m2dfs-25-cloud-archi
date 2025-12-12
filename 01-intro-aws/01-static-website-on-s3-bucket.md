@@ -40,7 +40,7 @@ C’est l’approche de base proposée dans la documentation officielle.
 
 ### 🗺️ Architecture (version simple avec S3)
 
-```
+```mermaid
 architecture-beta
     group aws_cloud(aws:aws-cloud)[AWS Cloud]
         service s3_bucket(aws:arch-amazon-simple-storage-service)[S3 Website Bucket] in aws_cloud
@@ -88,7 +88,7 @@ architecture-beta
 
 ## 🟧 Aperçu détaillé de l’architecture complète (S3 + CloudFront recommandé)
 
-```
+```mermaid
 flowchart LR
 
 subgraph DNS_TLS[DNS & TLS Layer]
