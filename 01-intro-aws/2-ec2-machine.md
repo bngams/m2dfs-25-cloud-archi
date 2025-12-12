@@ -59,7 +59,7 @@ Avec les instances Spot Amazon EC2, vous pouvez utiliser la capacité EC2 dispon
 
 ### Étapes principales
 
-![Aperçu architecture EC2](/mnt/data/402a6e0a-8942-4fe5-abfb-995eb1f80f09.png)
+![Aperçu architecture EC2](https://docs.aws.amazon.com/images/AWSEC2/latest/UserGuide/images/get-started-diagram.png)
 
 1. **Choisir une AMI** : Ubuntu 20.04 LTS.
 2. **Choisir un type d’instance** : t2.micro pour l’exemple.
