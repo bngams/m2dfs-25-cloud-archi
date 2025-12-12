@@ -1,20 +1,46 @@
-# Hébergement d’un site Web statique à l’aide d’Amazon S3
+# 🚀 Hébergement d’un site Web statique avec Amazon S3
 
-Objectifs: 
-* Découverte de AWS S3 et 1 cas d'usage simple
-* Découverte des règles et configurations liées aux ressources cloud (Policies, ACL, ...)
-* Découverte des différents composants connexes (Cloud Front, Route 53) et des autres types de services et alternatives (ex: Amplify...)
+## 🎯 Objectifs pédagogiques
 
+À la fin de ce module, vous serez capables de :
 
-Il existe plusieurs façons d'héberger un site statique sur AWS:
-- S3
-- Amplify
+* Comprendre le service Amazon S3 et son usage comme hébergement statique simple.
+* Configurer les règles d'accès : Bucket Policies, ACL, Block Public Access, OAC, etc.
+* Identifier les composants AWS liés à un site web statique :
 
-## Scénario 1: Mise en place simple avec S3
+  * 🌐 Amazon Route 53 (DNS)
+  * 🚀 Amazon CloudFront (CDN / optimisation / HTTPS)
+  * 🔐 AWS Certificate Manager (certificats TLS)
+* Comparer S3 avec d’autres solutions frontend sur AWS, comme AWS Amplify Hosting.
 
-https://docs.aws.amazon.com/fr_fr/AmazonS3/latest/userguide/WebsiteHosting.html
+---
 
-```mermaid
+## 🏗️ Les différentes façons d’héberger un site statique sur AWS
+
+AWS propose plusieurs services pour déployer un site statique (HTML/CSS/JS, SPA, fichiers statiques) :
+
+### ✔️ 1. Amazon S3
+
+La solution la plus simple : un bucket public servant un site statique depuis un endpoint HTTP.
+
+### ✔️ 2. Amazon S3 + CloudFront (recommandé)
+
+⚡ Plus rapide, plus sécurisé, HTTPS, cache CDN, intégration avec ACM.
+
+### ✔️ 3. AWS Amplify Hosting
+
+Solution moderne pour les sites complexes (SPA, SSR, SSG) avec CI/CD intégré.
+
+---
+
+## 🟦 Scénario 1 : Hébergement simple avec Amazon S3
+
+**🎯 Objectif :** Déployer un site statique simple directement via un bucket S3.
+C’est l’approche de base proposée dans la documentation officielle.
+
+### 🗺️ Architecture (version simple avec S3)
+
+```
 architecture-beta
     group aws_cloud(aws:aws-cloud)[AWS Cloud]
         service s3_bucket(aws:arch-amazon-simple-storage-service)[S3 Website Bucket] in aws_cloud
@@ -35,30 +61,46 @@ architecture-beta
     cert_manager:T -- B:cloudfront
 ```
 
-Autre aperçu de l'archi
+---
 
-```mermaid
+## 🧱 Analyse du scénario S3 simple
+
+### 📌 Avantages :
+
+* Très économique
+* Simple à mettre en place
+* Parfait pour un site statique sans contrainte HTTPS stricte
+
+### 📌 Inconvénients :
+
+* ❌ Pas de HTTPS (S3 website endpoint = HTTP only)
+* ❌ Bucket public obligatoire
+* ❌ Moins bon en performance sans CloudFront
+
+### 📌 Situations d’usage :
+
+* Démo simple
+* Portfolio
+* Site de documentation interne
+* POC / projets étudiants
+
+---
+
+## 🟧 Aperçu détaillé de l’architecture complète (S3 + CloudFront recommandé)
+
+```
 flowchart LR
 
-%% =====================================================================
-%% DNS & TLS
-%% =====================================================================
 subgraph DNS_TLS[DNS & TLS Layer]
     DNS[Route53 DNS]
     ACM[ACM Certificate]
 end
 
-%% =====================================================================
-%% CDN / Edge
-%% =====================================================================
 subgraph CDN[CDN Layer - CloudFront]
     CloudFront[CloudFront Distribution]
     WAF[AWS WAF Firewall]
 end
 
-%% =====================================================================
-%% S3 Buckets
-%% =====================================================================
 subgraph S3_WEBSITE[S3 Website Bucket - Public]
     S3_Bucket_Web[S3 Bucket - Website Endpoint]
     Index[Index.html & Error.html]
@@ -69,36 +111,26 @@ subgraph S3_PRIVATE[S3 Private Bucket for CloudFront]
     S3_Bucket_Private[S3 Bucket - Private Origin]
     Index2[Index.html & Error.html]
     BucketPolicyCF[Bucket Policy - Allow CloudFront OAC]
-    ObjectOwnership[Object Ownership: BucketOwnerEnforced]
+    ObjectOwnership[Object Ownership - BucketOwnerEnforced]
     Encryption[SSE-S3 or SSE-KMS]
 end
 
-%% =====================================================================
-%% Logging & Monitoring
-%% =====================================================================
 subgraph LOGS[Logging & Monitoring]
     LogsS3[Access Logs]
     LogsBucket[S3 Logs Bucket]
     Monitoring[CloudWatch Metrics & Alarms]
 end
 
-%% =====================================================================
-%% CI/CD
-%% =====================================================================
 subgraph CICD[CI/CD Pipeline]
     CI[CI/CD GitHub Actions, CodePipeline]
 end
 
-%% =====================================================================
-%% Connections
-%% =====================================================================
-
 DNS -->|Alias| CloudFront
-DNS -->|Alias for apex| S3_Bucket_Web
+DNS -->|Alias apex| S3_Bucket_Web
 ACM --> CloudFront
 
-CloudFront -->|Origin: OAC| S3_Bucket_Private
-CloudFront -->|Origin: Website Endpoint| S3_Bucket_Web
+CloudFront -->|Origin OAC| S3_Bucket_Private
+CloudFront -->|Origin Website endpoint| S3_Bucket_Web
 
 WAF --> CloudFront
 
@@ -122,18 +154,41 @@ Monitoring --> S3_Bucket_Web
 CI -->|Deploy files| S3_Bucket_Web
 CI -->|Invalidate cache| CloudFront
 
-%% Optional redirect bucket
 RedirectBucket[S3 Redirect Bucket www → apex] --> DNS
 RedirectBucket --> S3_Bucket_Web
 ```
 
-## Aller plus loin
+## 📚 🧑‍🏫 Explications pour les étudiants (avec icônes AWS en texte)
 
-Herberger une app plus complexe (SSR, SPA, SSG...)
-Connecter notre app à un dépot git
-...
+| Composant                       | Rôle                                    | Icône |
+| ------------------------------- | --------------------------------------- | ----- |
+| **Amazon S3**                   | Stockage d’objets, hébergement statique | 📦    |
+| **Bucket Policy**               | Règles d’accès JSON                     | 🔐    |
+| **ACL**                         | Ancien mécanisme d’accès (à éviter)     | ⚠️    |
+| **CloudFront**                  | CDN, HTTPS, cache                       | 🚀    |
+| **Route 53**                    | DNS managé                              | 🌐    |
+| **ACM**                         | Certificats TLS gratuits                | 🔏    |
+| **CloudWatch**                  | Logs & Monitoring                       | 📊    |
+| **AWS WAF**                     | Protection Web                          | 🛡️   |
+| **CI/CD (GitHub/CodePipeline)** | Automatisation du déploiement           | 🤖    |
 
-Ex: https://aws.amazon.com/fr/amplify/
+---
 
-Image:
-https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/product-categories/frontend-web-mobile/approved/images/7361d2c9-01e3-4e25-86ca-cb4591c069c2.bee7ede0dd142cad72cdf5f9c5494dc139f2ea4a.png
+## 🚀 Aller plus loin
+
+Pour des applications plus complexes (React, Vue, Next.js, Angular, SSR, SSG, SPA), ou si vous voulez déployer automatiquement depuis un dépôt GitHub :
+
+👉 **AWS Amplify Hosting**
+[https://aws.amazon.com/fr/amplify/](https://aws.amazon.com/fr/amplify/)
+
+### 📌 Avantages :
+
+* Build & deploy automatiques
+* HTTPS intégré
+* Prévisualisation des PR
+* Gestion de plusieurs environnements (dev/stage/prod)
+* Support SSR/SSG pour Next.js
+
+### 🖼️ Schéma officiel (Amplify)
+
+![AWS Amplify Architecture](https://d1.awsstatic.com/onedam/marketing-channels/website/aws/en_US/product-categories/frontend-web-mobile/approved/images/7361d2c9-01e3-4e25-86ca-cb4591c069c2.bee7ede0dd142cad72cdf5f9c5494dc139f2ea4a.png)
