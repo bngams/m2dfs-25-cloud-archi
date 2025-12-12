@@ -45,6 +45,10 @@ Avec les instances Spot Amazon EC2, vous pouvez utiliser la capacité EC2 dispon
 
 > ⚠️ Exemple pratique : pour une utilisation continue 24/7, EC2 n’est pas toujours le moins cher. Par exemple, un VPS classique chez OVH ou Scaleway :
 >
+> **Équivalent AWS EC2** : EC2 t3a.medium (approximation)
+> À partir de ~31 € HT/mois (~37 € TTC/mois)
+> 2 vCPU, 4 Go RAM, stockage EBS à ajouter
+>
 > **VPS-1 OVH**
 > À partir de 3,82 € HT/mois (soit 4,58 € TTC/mois)
 > 4 vCores, 8 Go RAM, 75 Go SSD
@@ -54,6 +58,8 @@ Avec les instances Spot Amazon EC2, vous pouvez utiliser la capacité EC2 dispon
 ## 🖥️ Mise en pratique : créer une instance EC2
 
 ### Étapes principales
+
+![Aperçu architecture EC2](/mnt/data/402a6e0a-8942-4fe5-abfb-995eb1f80f09.png)
 
 1. **Choisir une AMI** : Ubuntu 20.04 LTS.
 2. **Choisir un type d’instance** : t2.micro pour l’exemple.
