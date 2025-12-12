@@ -40,57 +40,91 @@ Autre aperçu de l'archi
 ```mermaid
 flowchart LR
 
-  %% Domain & DNS
-  DNS[Route53 / DNS] -->|Alias| CloudFront[CloudFront Distribution]
-  DNS -->|Alias apex| S3_Bucket_Web[S3 Bucket website endpoint]
+%% =====================================================================
+%% DNS & TLS
+%% =====================================================================
+subgraph DNS_TLS[DNS & TLS Layer]
+    DNS[Route53 DNS]
+    ACM[ACM Certificate]
+end
 
-  %% TLS
-  ACM[ACM Certificate] --> CloudFront
+%% =====================================================================
+%% CDN / Edge
+%% =====================================================================
+subgraph CDN[CDN Layer - CloudFront]
+    CloudFront[CloudFront Distribution]
+    WAF[AWS WAF Firewall]
+end
 
-  %% CDN & Origins
-  CloudFront -->|Origin private with OAC| S3_Bucket_Private[S3 Bucket private origin]
-  CloudFront -->|Origin website endpoint| S3_Bucket_Web
+%% =====================================================================
+%% S3 Buckets
+%% =====================================================================
+subgraph S3_WEBSITE[S3 Website Bucket - Public]
+    S3_Bucket_Web[S3 Bucket - Website Endpoint]
+    Index[Index.html & Error.html]
+    BucketPolicyPublic[Bucket Policy - Public Read]
+end
 
-  %% S3 website bucket components
-  S3_Bucket_Web --- Index[Index.html and Error.html]
+subgraph S3_PRIVATE[S3 Private Bucket for CloudFront]
+    S3_Bucket_Private[S3 Bucket - Private Origin]
+    Index2[Index.html & Error.html]
+    BucketPolicyCF[Bucket Policy - Allow CloudFront OAC]
+    ObjectOwnership[Object Ownership: BucketOwnerEnforced]
+    Encryption[SSE-S3 or SSE-KMS]
+end
 
-  %% S3 private bucket components
-  S3_Bucket_Private --- Index2[Index.html and Error.html]
+%% =====================================================================
+%% Logging & Monitoring
+%% =====================================================================
+subgraph LOGS[Logging & Monitoring]
+    LogsS3[Access Logs]
+    LogsBucket[S3 Logs Bucket]
+    Monitoring[CloudWatch Metrics & Alarms]
+end
 
-  %% Policies
-  S3_Bucket_Web --> BucketPolicyPublic[Bucket Policy public read]
-  S3_Bucket_Private --> BucketPolicyCF[Bucket Policy allow CloudFront OAC]
+%% =====================================================================
+%% CI/CD
+%% =====================================================================
+subgraph CICD[CI/CD Pipeline]
+    CI[CI/CD GitHub Actions, CodePipeline]
+end
 
-  %% Object ownership
-  S3_Bucket_Private --> ObjectOwnership[Object Ownership BucketOwnerEnforced]
+%% =====================================================================
+%% Connections
+%% =====================================================================
 
-  %% ACL
-  ACL_note[ACL legacy not recommended]
-  S3_Bucket_Web --- ACL_note
-  S3_Bucket_Private --- ACL_note
+DNS -->|Alias| CloudFront
+DNS -->|Alias for apex| S3_Bucket_Web
+ACM --> CloudFront
 
-  %% Security and logging
-  WAF[AWS WAF] --> CloudFront
-  LogsS3[Access logs] --> LogsBucket[S3 Logs Bucket]
-  CloudFront --> LogsS3
-  S3_Bucket_Web --> LogsS3
+CloudFront -->|Origin: OAC| S3_Bucket_Private
+CloudFront -->|Origin: Website Endpoint| S3_Bucket_Web
 
-  %% CI CD
-  CI[CI CD deploy tool] -->|Deploy files| S3_Bucket_Web
-  CI -->|Invalidate cache| CloudFront
+WAF --> CloudFront
 
-  %% Monitoring
-  Monitoring[CloudWatch metrics and alarms] --> CloudFront
-  Monitoring --> S3_Bucket_Web
+S3_Bucket_Web --- Index
+S3_Bucket_Private --- Index2
 
-  %% Data management
-  Lifecycle[Lifecycle rules and Versioning] --> S3_Bucket_Web
-  Encryption[SSE S3 or SSE KMS] --> S3_Bucket_Private
-  Encryption --> S3_Bucket_Web
+S3_Bucket_Web --> BucketPolicyPublic
+S3_Bucket_Private --> BucketPolicyCF
 
-  %% Redirect bucket
-  RedirectBucket[S3 redirect bucket www to apex] --> DNS
-  RedirectBucket --> S3_Bucket_Web
+S3_Bucket_Private --> ObjectOwnership
+S3_Bucket_Private --> Encryption
+S3_Bucket_Web --> Encryption
+
+CloudFront --> LogsS3
+S3_Bucket_Web --> LogsS3
+LogsS3 --> LogsBucket
+
+Monitoring --> CloudFront
+Monitoring --> S3_Bucket_Web
+
+CI -->|Deploy files| S3_Bucket_Web
+CI -->|Invalidate cache| CloudFront
+
+%% Optional redirect bucket
+RedirectBucket[S3 Redirect Bucket www → apex] --> DNS
+RedirectBucket --> S3_Bucket_Web
 ```
 
 ## Aller plus loin
