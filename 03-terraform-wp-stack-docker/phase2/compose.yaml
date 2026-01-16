@@ -1,0 +1,48 @@
+# espace de stockage associé au container
+volumes:
+  mysql_data: {}
+  wp_data: {}
+
+# réseau personnalisé pour les containers
+networks:
+  wpnet: {}
+
+services:
+  db:
+    image: mysql:latest
+    restart: always
+    # config. mysql server
+    environment:
+      MYSQL_ROOT_PASSWORD: MySQLRootPassword
+      MYSQL_DATABASE: MySQLDatabaseName
+      MYSQL_USER: MySQLUsername
+      MYSQL_PASSWORD: MySQLUserPassword
+    # stockage persistant des données mysql
+    volumes:
+      # <mon volume> : <chemin dans le container>
+      - mysql_data:/var/lib/mysql
+    networks:
+      # le nom du réseau personnalisé
+      - wpnet
+    # Acces externe / exposer le container
+    # ports:
+    #  - "3306:3306"
+
+  wordpress:
+    depends_on:
+      - db # nom du container de la base de données (service db)
+    image: wordpress:latest
+    restart: always
+    ports:
+      # mappage des ports hôte:container
+      - "80:80"
+      - "443:443"
+    environment:
+      WORDPRESS_DB_HOST: db:3306 # nom du service de la base de données et son port interne
+      WORDPRESS_DB_USER: MySQLUsername
+      WORDPRESS_DB_PASSWORD: MySQLUserPassword
+      WORDPRESS_DB_NAME: MySQLDatabaseName
+    volumes:
+      - "wp_data:/var/www/html"
+    networks:
+      - wpnet
