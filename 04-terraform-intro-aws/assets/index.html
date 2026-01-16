@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome S3 site</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+        background: linear-gradient(135deg, #4f8cff 0%, #38e8ff 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .container {
+        background: rgba(255,255,255,0.95);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        padding: 48px 32px;
+        max-width: 400px;
+        text-align: center;
+        animation: fadeIn 1.2s ease;
+    }
+    h1 {
+        font-size: 2.5rem;
+        color: #4f8cff;
+        margin-bottom: 16px;
+        letter-spacing: 2px;
+    }
+    p {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 32px;
+    }
+    .btn {
+        display: inline-block;
+        padding: 12px 32px;
+        background: linear-gradient(90deg, #4f8cff 0%, #38e8ff 100%);
+        color: #fff;
+        font-size: 1rem;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        transition: background 0.3s, transform 0.2s;
+        text-decoration: none;
+    }
+    .btn:hover {
+        background: linear-gradient(90deg, #38e8ff 0%, #4f8cff 100%);
+        transform: scale(1.05);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+</head>
+<body>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Welcome to Your S3 Site!</h1>
+        <p>This is a modern static website hosted on AWS S3.<br>Fast, secure, and scalable.</p>
+        <a class="btn" href="https://aws.amazon.com/s3/" target="_blank">Learn More</a>
+    </div>
+</body>
+</html>
