@@ -1,0 +1,5 @@
+# Ignore Terraform files
+# .terraform/ folder which is like node_modules for Terraform
+.terraform
+*.tfstate
+*.tfstate.backup
