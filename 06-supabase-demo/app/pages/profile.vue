@@ -21,7 +21,7 @@ const loadAvatar = () => {
 const uploadAvatar = (file) => {
   const supabase = useSupabase()
   if (user.value && file) {
-    supabase.storage.from('avatars').upload(user.value.id, file, { upsert: false }).then(({ data, error }) => {
+    supabase.storage.from('avatars').upload(user.value.id, file, { upsert: true }).then(({ data, error }) => {
       if (error) {
         console.error('Error uploading avatar:', error)
       } else {
