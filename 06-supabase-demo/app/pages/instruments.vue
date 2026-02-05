@@ -14,6 +14,19 @@ async function getInstruments() {
   instruments.value = data
 }
 
+// INSERT SAMPLE /!\ RLS Policies must be disabled for this to work
+// function createInstrument() {
+//   const supabase = useSupabase();
+//   supabase.from('instruments').insert({ name: 'New Instrument' }).then(({ data, error }) => {
+//     if (error) {
+//       console.error('Error creating instrument:', error)
+//     } else {
+//       console.log('Created instrument:', data)
+//       getInstruments() // Refresh the list after creating a new instrument
+//     }
+//   })
+// }
+
 // Utiliser le hook onMounted pour appeler la fonction getInstruments
 // lorsque le composant est monté
 // autrement dit lorsque la page est chargée

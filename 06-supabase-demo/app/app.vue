@@ -33,7 +33,7 @@ onMounted(() => {
   })
 })
 
-logout = () => {
+const logout = () => {
   const supabase = useSupabase()
   supabase.auth.signOut().then(() => {
     user.value = null
@@ -67,16 +67,16 @@ logout = () => {
         <UButton
           v-if="!user"
           to="/login"
-          variant="outline"
-          icon="i-ui-login"
+          variant="ghost"
+          icon="i-heroicons-arrow-right-on-rectangle"
           aria-label="Login"
           color="neutral"
         />
 
         <UButton
           v-if="user"
-          variant="outline"
-          icon="i-ui-logout"
+          variant="ghost"
+          icon="i-heroicons-arrow-left-on-rectangle"
           aria-label="Logout"
           color="neutral"
           @click="logout"
